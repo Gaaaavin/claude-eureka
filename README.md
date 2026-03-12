@@ -1,118 +1,152 @@
+<div align="center">
+
 # claude-eureka
 
 **Claude Code skills for ML/AI researchers.**
 
-Stop re-teaching Claude your project. Eureka auto-detects your stack, manages experiments, debugs training, and learns as you work.
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/Gaaaavin/claude-eureka)](https://github.com/Gaaaavin/claude-eureka/releases)
+[![GitHub stars](https://img.shields.io/github/stars/Gaaaavin/claude-eureka?style=social)](https://github.com/Gaaaavin/claude-eureka/stargazers)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+
+Stop re-teaching Claude your project every session. Eureka auto-detects your stack, manages experiments, debugs training, and learns as you work.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/Gaaaavin/claude-eureka/main/install.sh | bash
+```
+
+Then inside Claude Code: `/init-eureka`
+
+</div>
+
+---
+
+## What Is This?
+
+**Claude Code** is Anthropic's AI coding agent. **Skills** extend it with slash commands and passive triggers. `claude-eureka` is a curated skill pack built specifically for ML/AI research workflows.
+
+Out of the box you get commands for experiments, debugging, code review, SLURM job submission, and publication-quality plots — all assuming you know PyTorch and care about research velocity, not boilerplate.
+
+```
+Before eureka:        After /init-eureka:
+
+"Here's my project    Claude already knows:
+ structure..."        ✓ PyTorch + Lightning + Hydra
+"I use Hydra for      ✓ experiment layout in runs/
+ config..."           ✓ SLURM cluster + GPU types
+"My runs go in..."    ✓ active branches and open TODOs
+"Oh, and I'm         ✓ NaN bug you fixed last week
+ working on..."
+```
 
 ---
 
 ## Quick Start
 
+**1. Install (30 seconds)**
+
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Gaaaavin/claude-eureka/main/install.sh | bash
 ```
 
-Then in Claude Code:
+The installer copies skills to `~/.claude/` (user-level) or `./.claude/` (project-level). Pick whichever fits. No npm, no pip — it's markdown files and one shell script.
+
+**2. Initialize your project**
+
+Open Claude Code in your project directory and run:
 
 ```
 /init-eureka
 ```
 
-That's it. The installer downloads eureka and copies skills to `~/.claude/`. Then `/init-eureka` scans your project, generates a tailored `CLAUDE.md`, and sets up context files so Claude understands your codebase from the first prompt.
+This scans your repo, detects your stack (PyTorch, Lightning, Hydra, W&B, SLURM, etc.), and writes a tailored `CLAUDE.md`. Claude reads it on every prompt. Your context is set.
 
----
+**3. Get to work**
 
-## What It Does
-
-### 1. Auto-detects your project
-
-`/init-eureka` scans your repo and generates a `CLAUDE.md` with your stack (PyTorch, Lightning, Hydra, W&B, SLURM, etc.), key paths, active work state, and research context. No manual configuration.
-
-### 2. Research-first commands
-
-Purpose-built commands for ML/AI workflows: run experiments, debug training failures, generate publication-quality plots, scaffold boilerplate, submit SLURM jobs, and more. Every command assumes you know PyTorch and care about research velocity, not boilerplate.
-
-### 3. Self-evolving context
-
-The agent creates and maintains context files (`.claude/context/`) as you work. It records experiment results, conventions, architecture decisions, and resolved gotchas. Your second session is smarter than your first.
+```
+/experiment baseline --lr 1e-4 --batch 64
+/debug                     ← training loss exploded
+/viz runs/                 ← generate paper-quality figures
+/submit-job train.py       ← SLURM submission
+```
 
 ---
 
 ## Skill Catalog
 
-### Commands
+### Commands (explicit `/slash` invocations)
 
-| Command | Description |
+| Command | What it does |
 |---------|-------------|
-| `/init-eureka` | Scan project and generate a tailored `CLAUDE.md` |
-| `/refresh-context` | Re-run detection and update auto-generated sections |
+| `/init-eureka` | Scan project → generate tailored `CLAUDE.md` |
+| `/refresh-context` | Re-detect stack, update auto-sections, keep your edits |
 | `/experiment` | Create, launch, track, and log experiments |
-| `/debug` | Systematic root-cause debugging (investigate first, fix second) |
-| `/review` | Code review with YAGNI/KISS focus and ML anti-pattern detection |
-| `/scaffold` | Generate boilerplate: model, dataset, trainer, config, SLURM |
-| `/viz` | Publication-quality plots from experiment data |
+| `/debug` | Root-cause debugging — investigate first, patch second |
+| `/review` | Code review with YAGNI/KISS + ML anti-pattern detection |
+| `/scaffold` | Boilerplate: model, dataset, trainer, config, SLURM script |
+| `/viz` | Publication-quality figures from experiment outputs |
 | `/notebook` | Structured Jupyter analysis notebooks |
-| `/submit-job` | SLURM job submission, monitoring, and debugging |
-| `/create-skill` | Author new skills or commands |
-| `/contribute-skill` | Package a local skill and open a PR to claude-eureka |
-| `/update-eureka` | Update installed commands and skills to the latest version |
+| `/submit-job` | SLURM submission, status monitoring, log tailing |
+| `/create-skill` | Author new skills or commands (guided) |
+| `/contribute-skill` | Package a skill and open a PR to this repo |
+| `/update-eureka` | Pull latest commands and skills from GitHub |
 
-### Passive Skills
+### Passive Skills (trigger automatically)
 
-These activate automatically -- no slash command needed.
-
-| Skill | Triggers on |
+| Skill | Activates on |
 |-------|-------------|
-| `research-debugging` | Any error, exception, NaN, OOM, CUDA error, traceback |
-| `auto-memory` | "remember", "convention", experiment completion, bug resolution |
+| `research-debugging` | Errors, exceptions, NaN, OOM, CUDA errors, tracebacks |
+| `auto-memory` | "remember", conventions, experiment completions, bug resolutions |
 
 ---
 
 ## How It Works
 
-Eureka uses a tiered context architecture to give Claude the right information without blowing up the context window:
+Eureka uses a tiered context architecture so Claude gets exactly what it needs without wasting tokens:
 
 ```
-CLAUDE.md (~50 lines)
-  Project identity, stack, key paths, active work.
-  Loaded on every prompt.
-
-.claude/context/*.md
-  Detailed context files: experiments, conventions, architecture.
-  Loaded when relevant.
-
-Auto-memory
-  Agent updates context files as you work.
-  Experiment results, resolved bugs, and conventions persist across sessions.
+CLAUDE.md  (~50 lines, loaded every prompt)
+│  Project identity, stack, key paths, active work state.
+│
+└── .claude/context/*.md  (loaded on demand)
+       Experiments, architecture decisions, resolved bugs,
+       team conventions. Claude loads relevant files per query.
+       |
+       └── auto-memory  (agent-maintained)
+              Results and learnings written back automatically.
+              Your second session is smarter than your first.
 ```
 
-`/init-eureka` generates the first two tiers. The `auto-memory` skill maintains them over time. `/refresh-context` re-runs detection to keep auto-generated sections current while preserving your manual additions.
+`/init-eureka` populates tiers 1 and 2. The `auto-memory` skill fills tier 3 over time. `/refresh-context` re-runs detection to keep auto-generated sections current while preserving your manual edits.
 
 ---
 
 ## Install Options
 
-The one-liner installs everything. The installer prompts you to choose:
-
-**User-level (`~/.claude/`)** -- available in all your projects. Good default.
-
-**Project-level (`./.claude/`)** -- scoped to one project. Good for team repos.
+**User-level** — available in every project (recommended):
 
 ```bash
-# From your project directory, choose option 2 when prompted:
+curl -fsSL https://raw.githubusercontent.com/Gaaaavin/claude-eureka/main/install.sh | bash
+# Choose option 1 when prompted
+```
+
+**Project-level** — scoped to one repo, good for team setups:
+
+```bash
+# From your project directory, choose option 2:
 curl -fsSL https://raw.githubusercontent.com/Gaaaavin/claude-eureka/main/install.sh | bash
 ```
 
-**Selective** -- clone the repo and copy only what you want:
+**Selective** — cherry-pick only the commands you want:
 
 ```bash
-git clone https://github.com/Gaaaavin/claude-eureka.git /tmp/claude-eureka
-cp /tmp/claude-eureka/commands/experiment.md ~/.claude/commands/
-cp /tmp/claude-eureka/commands/debug.md ~/.claude/commands/
-rm -rf /tmp/claude-eureka
+git clone https://github.com/Gaaaavin/claude-eureka.git /tmp/ce
+cp /tmp/ce/commands/experiment.md ~/.claude/commands/
+cp /tmp/ce/commands/debug.md ~/.claude/commands/
+rm -rf /tmp/ce
 ```
 
-**From a local clone** -- if you want to contribute or develop:
+**From a local clone** — for contributors:
 
 ```bash
 git clone https://github.com/Gaaaavin/claude-eureka.git
@@ -123,13 +157,13 @@ cd claude-eureka && ./install.sh
 
 ## Recommended MCP Servers
 
-These are optional but unlock additional capabilities (W&B experiment queries, GitHub PR workflows):
+Optional, but unlock deeper capabilities:
 
 ```bash
-# Weights & Biases (experiment tracking, trace queries)
+# Weights & Biases — query experiments, runs, traces
 claude mcp add wandb -- npx -y @anthropic-ai/mcp-wandb@latest
 
-# GitHub (PRs, issues, code search)
+# GitHub — PRs, issues, code search
 claude mcp add github -- npx -y @anthropic-ai/mcp-github@latest
 ```
 
@@ -137,28 +171,28 @@ claude mcp add github -- npx -y @anthropic-ai/mcp-github@latest
 
 ## Philosophy
 
-**Opinionated defaults, escapable.** Works great out of the box. Everything is a markdown file you can edit or replace.
+**Opinionated defaults, fully escapable.** Works great out of the box. Every skill is a markdown file you can edit or replace.
 
-**Pure markdown + bash.** No npm, no pip, no runtime dependencies. ML researchers have enough dependency hell. The entire project is `.md` files and one shell script.
+**Zero runtime dependencies.** No npm, no pip, no Docker. ML researchers have enough dependency hell. The entire project is `.md` files and one shell script.
 
-**Context is precious.** Skills are concise. Claude is already smart; we just give it your project context. No thousand-line system prompts.
+**Context is precious.** Skills are concise by design. Claude is already smart — we give it your project's specific context, not a thousand-line system prompt.
 
-**Research-first.** Every command is designed for ML/AI workflows, not generic software development. `/debug` knows about gradient issues and CUDA errors. `/review` catches research anti-patterns. `/scaffold` generates PyTorch modules, not React components.
+**Research-first, always.** `/debug` knows about gradient explosions and CUDA OOM. `/review` catches research anti-patterns like data leakage and metric p-hacking. `/scaffold` generates PyTorch modules, not React components.
 
 ---
 
 ## Contributing
 
-Contributions welcome. The fastest path:
+The fastest path to contributing:
 
-1. Use `/create-skill` to author a new command or skill locally
-2. Test it in your own workflow
-3. Use `/contribute-skill` to package it and open a PR
+1. Use `/create-skill` to author a command or skill locally
+2. Test it in your own workflow for a few days
+3. Use `/contribute-skill` to open a PR — it handles the packaging
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines on skill structure, testing, and review criteria.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for structure requirements, style guide, and CI checks.
 
 ---
 
 ## License
 
-[Apache 2.0](LICENSE)
+[Apache 2.0](LICENSE) — use freely, attribution appreciated.
