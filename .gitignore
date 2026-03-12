@@ -1,0 +1,15 @@
+# Claude Code local context (user-specific, not for version control)
+.claude/
+
+# macOS
+.DS_Store
+
+# Editor
+.idea/
+.vscode/
+*.swp
+*~
+
+# Temp / test installs
+tmp/
+test-install/
