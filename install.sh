@@ -54,7 +54,7 @@ echo ""
 
 echo "Where should eureka be installed?"
 echo ""
-echo "  1) User-level (~/.claude/)    — available in all projects"
+echo "  1) User-level (~/.claude/)    — available in all projects (recommended)"
 echo "  2) Project-level (./.claude/) — scoped to this project"
 echo ""
 
