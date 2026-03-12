@@ -1,0 +1,119 @@
+name: Validate Skills and Commands
+
+on:
+  pull_request:
+    paths:
+      - 'commands/**'
+      - 'skills/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check command frontmatter
+        run: |
+          exit_code=0
+          for file in commands/*.md; do
+            [ -f "$file" ] || continue
+            # Check for YAML frontmatter delimiters
+            if ! head -1 "$file" | grep -q '^---$'; then
+              echo "ERROR: $file missing YAML frontmatter"
+              exit_code=1
+              continue
+            fi
+            # Extract frontmatter (between first and second ---)
+            frontmatter=$(sed -n '1,/^---$/p' "$file" | tail -n +2 | head -n -1)
+            # Check required fields
+            if ! echo "$frontmatter" | grep -q '^name:'; then
+              echo "ERROR: $file missing 'name' in frontmatter"
+              exit_code=1
+            fi
+            if ! echo "$frontmatter" | grep -q '^description:'; then
+              echo "ERROR: $file missing 'description' in frontmatter"
+              exit_code=1
+            fi
+          done
+          exit $exit_code
+
+      - name: Check skill SKILL.md and frontmatter
+        run: |
+          exit_code=0
+          for dir in skills/*/; do
+            [ -d "$dir" ] || continue
+            skill_file="${dir}SKILL.md"
+            if [ ! -f "$skill_file" ]; then
+              echo "ERROR: $dir missing SKILL.md"
+              exit_code=1
+              continue
+            fi
+            if ! head -1 "$skill_file" | grep -q '^---$'; then
+              echo "ERROR: $skill_file missing YAML frontmatter"
+              exit_code=1
+              continue
+            fi
+            frontmatter=$(sed -n '1,/^---$/p' "$skill_file" | tail -n +2 | head -n -1)
+            if ! echo "$frontmatter" | grep -q '^name:'; then
+              echo "ERROR: $skill_file missing 'name' in frontmatter"
+              exit_code=1
+            fi
+            if ! echo "$frontmatter" | grep -q '^description:'; then
+              echo "ERROR: $skill_file missing 'description' in frontmatter"
+              exit_code=1
+            fi
+          done
+          exit $exit_code
+
+      - name: Check for hardcoded absolute paths
+        run: |
+          exit_code=0
+          for file in $(find commands skills -name '*.md' 2>/dev/null); do
+            if grep -nE '(/Users/|/home/|/data/|/opt/)' "$file"; then
+              echo "ERROR: $file contains hardcoded absolute path"
+              exit_code=1
+            fi
+          done
+          exit $exit_code
+
+      - name: Check description length
+        run: |
+          exit_code=0
+          check_desc() {
+            local file="$1"
+            local max_chars=200
+            # Extract description value from frontmatter
+            desc=$(sed -n '/^---$/,/^---$/p' "$file" | grep '^description:' | sed 's/^description: *//' | sed 's/^["'"'"']//' | sed 's/["'"'"']$//')
+            if [ -n "$desc" ] && [ ${#desc} -gt $max_chars ]; then
+              echo "ERROR: $file description is ${#desc} chars (max $max_chars)"
+              exit_code=1
+            fi
+          }
+          for file in commands/*.md; do
+            [ -f "$file" ] && check_desc "$file"
+          done
+          for file in skills/*/SKILL.md; do
+            [ -f "$file" ] && check_desc "$file"
+          done
+          exit $exit_code
+
+      - name: Check file size limits
+        run: |
+          exit_code=0
+          for file in commands/*.md; do
+            [ -f "$file" ] || continue
+            lines=$(wc -l < "$file")
+            if [ "$lines" -gt 300 ]; then
+              echo "ERROR: $file is $lines lines (max 300)"
+              exit_code=1
+            fi
+          done
+          for file in skills/*/SKILL.md; do
+            [ -f "$file" ] || continue
+            lines=$(wc -l < "$file")
+            if [ "$lines" -gt 500 ]; then
+              echo "ERROR: $file is $lines lines (max 500)"
+              exit_code=1
+            fi
+          done
+          exit $exit_code

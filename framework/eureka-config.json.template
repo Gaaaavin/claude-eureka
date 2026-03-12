@@ -1,0 +1,13 @@
+{
+  "version": "0.1.0",
+  "installedAt": "__INSTALL_DATE__",
+  "installPath": "__INSTALL_PATH__",
+  "installType": "__INSTALL_TYPE__",
+  "commands": [],
+  "skills": [],
+  "context": {
+    "experiments": ".claude/context/experiments.md",
+    "conventions": ".claude/context/conventions.md",
+    "architecture": ".claude/context/architecture.md"
+  }
+}

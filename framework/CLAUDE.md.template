@@ -1,0 +1,71 @@
+# Project Configuration
+
+<!-- eureka:auto-start — DO NOT edit between auto markers; use /refresh-context to update -->
+
+## Identity
+
+- **Project**: (detected by /init-eureka)
+- **Stack**: (detected by /init-eureka)
+- **Description**: (detected by /init-eureka)
+
+## Key Paths
+
+| Path | Purpose |
+|------|---------|
+| (detected by /init-eureka) | |
+
+## Active Work
+
+(Run /init-eureka or /refresh-context to populate)
+
+## Context Files
+
+Detailed context lives in `.claude/context/` — read on demand:
+
+- `.claude/context/experiments.md` — experiment log (hypotheses, results, next steps)
+- `.claude/context/conventions.md` — project conventions (naming, config format, logging)
+- `.claude/context/architecture.md` — codebase architecture (modules, data flow, key abstractions)
+
+<!-- eureka:auto-end -->
+
+<!-- eureka:user-start — Your additions below are preserved across /refresh-context -->
+
+
+
+<!-- eureka:user-end -->
+
+## Auto-Memory Protocol
+
+The agent updates context files when it observes these triggers:
+
+| Trigger | Action | Target File |
+|---------|--------|-------------|
+| Experiment completes | Log hypothesis, config, result, next steps | `context/experiments.md` |
+| Bug resolved | Log root cause + fix | `context/conventions.md` |
+| "remember", "always do", "convention" | Save preference/convention | `context/conventions.md` |
+| Architecture discovery | Document module, data flow | `context/architecture.md` |
+
+## Available Commands
+
+| Command | Description |
+|---------|-------------|
+| `/init-eureka` | Scan project and generate CLAUDE.md |
+| `/refresh-context` | Regenerate auto-sections from project state |
+| `/experiment` | Create, launch, and track experiments |
+| `/debug` | Systematic root-cause debugging |
+| `/review` | Code review (YAGNI/KISS + research patterns) |
+| `/scaffold` | Generate boilerplate (model, dataset, trainer, config, slurm) |
+| `/viz` | Publication-quality plot generation |
+| `/notebook` | Analysis notebook creation |
+| `/submit-job` | SLURM job submission and monitoring |
+| `/create-skill` | Author new skills or commands |
+| `/contribute-skill` | Package a skill and open PR to claude-eureka |
+| `/update-eureka` | Update installed commands and skills to latest version |
+
+## Guidelines
+
+- Prefer concise, precise technical responses
+- Assume familiarity with PyTorch, Linux, standard ML tooling
+- Don't add features beyond what's requested
+- When debugging, always find root cause first (use /debug)
+- Log experiment results to `.claude/context/experiments.md`
