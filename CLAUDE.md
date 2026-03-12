@@ -1,9 +1,66 @@
 # claude-eureka — Development Guide
 
-A curated, self-evolving collection of Claude Code skills for ML/AI researchers.
+<!-- eureka:auto-start — DO NOT edit between auto markers; use /refresh-context to update -->
 
-**Repo**: `Gaaaavin/claude-eureka` (public, Apache 2.0)
-**Stack**: Pure markdown + bash. Zero runtime dependencies.
+## Identity
+
+- **Project**: claude-eureka
+- **Stack**: Markdown + Bash | Zero runtime dependencies
+- **Description**: Self-evolving collection of Claude Code skills for ML/AI researchers. Developed using eureka itself (dogfooding).
+
+## Key Paths
+
+| Path | Purpose |
+|------|---------|
+| `commands/*.md` | Slash commands — one file per command |
+| `skills/*/SKILL.md` | Passive skills — auto-triggered by keyword |
+| `framework/CLAUDE.md.template` | Template installed into user projects |
+| `framework/hooks/skill-discovery.sh` | UserPromptSubmit hook bundled with install |
+| `install.sh` | curl\|bash installer (also runs from local clone) |
+| `.github/workflows/validate-skills.yml` | CI: frontmatter + line count validation |
+| `.claude/context/` | Agent context files (not for humans) |
+
+## Active Work
+
+- Current focus: Post v0.1.0 — bootstrapping eureka for this repo (CLAUDE.md updated, context files initialized)
+- Recent commits: add gitignore, update install script, README overhaul, initial v0.1.0 release
+- Open items: 0 Python TODOs (no .py files); CLAUDE.md has uncommitted changes
+
+## Context Files
+
+Detailed context lives in `.claude/context/` — read on demand:
+
+- `.claude/context/experiments.md` — experiment log (command variants tested, quality results)
+- `.claude/context/conventions.md` — project conventions (frontmatter rules, naming, CI behavior)
+- `.claude/context/architecture.md` — codebase architecture (install flow, hook system, marker protocol)
+
+<!-- eureka:auto-end -->
+
+<!-- eureka:user-start — Your additions below are preserved across /refresh-context -->
+
+## Self-Evolving Workflow
+
+**This repo is developed using eureka itself.** When working on claude-eureka, apply the same tools you're building:
+
+| Task | Use |
+|------|-----|
+| Drafting a new command or skill | `/create-skill` |
+| Shipping a new command or skill | `/contribute-skill` |
+| Reviewing changed `.md` files | `/review` |
+| Debugging `install.sh` or hook behavior | `/debug` |
+| Iterating on command output quality | `/experiment` to track variants |
+| Updating auto-sections of this file | `/refresh-context` |
+
+**Dogfooding rule**: Before shipping a new skill, run it on a real task inside this repo. If it doesn't help you work on eureka, it needs revision.
+
+**Self-evolution loop**:
+1. Identify friction in the development workflow
+2. `/create-skill` → draft a command/skill that addresses it
+3. Test: `./install.sh` locally → new Claude Code session → invoke the skill
+4. `/review` the skill file itself
+5. `/contribute-skill` → open a PR
+
+---
 
 ## Repository Structure
 
@@ -86,3 +143,5 @@ Runs on PRs touching `commands/**` or `skills/**`. Checks:
 - Test changes by running `./install.sh` locally, then starting a new Claude Code session.
 - The `framework/CLAUDE.md.template` uses marker comments (`<!-- eureka:auto-start -->` etc.) — preserve these exactly.
 - `install.sh` uses `sed` for template substitution — placeholders use `__DOUBLE_UNDERSCORE__` format.
+
+<!-- eureka:user-end -->
