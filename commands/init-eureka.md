@@ -3,7 +3,7 @@ name: init-eureka
 description:
   Scan a research project and generate a tailored CLAUDE.md with detected stack,
   research context, and active work state.
-allowed-tools: [Read, Write, Edit, Bash, Glob, Grep]
+allowed-tools: [Read, Write, Edit, Bash, Glob, Grep, AskUserQuestion]
 argument-hint: "(optional) project name"
 ---
 
@@ -92,52 +92,78 @@ Summarize as 2-3 bullet points of current focus.
 
 ## Step 4: Generate CLAUDE.md
 
-Read the template at `framework/CLAUDE.md.template` (relative to the claude-eureka install, not the target project).
+First, check whether `CLAUDE.md` already exists in the project root.
 
-If the template is not found at the expected path, check:
-- The directory where this command file lives: `../framework/CLAUDE.md.template`
-- Fall back to a sensible default structure if template is missing.
+### Case A — CLAUDE.md exists with eureka markers
 
-Fill in the auto-generated sections between `<!-- eureka:auto-start -->` and `<!-- eureka:auto-end -->`:
+If the file contains `<!-- eureka:auto-start -->` and `<!-- eureka:auto-end -->`:
+- Use Edit to replace **only** the content between those markers with the new auto section.
+- Preserve everything outside the markers exactly — do not touch user content.
+- Do not ask for confirmation; this is a safe, targeted update.
 
-### Identity section
+### Case B — CLAUDE.md exists without eureka markers
+
+If the file exists but has no eureka markers:
+- Read the full existing content.
+- Prepend the new auto section (wrapped in markers) at the top.
+- Wrap the original content in `<!-- eureka:user-start -->` / `<!-- eureka:user-end -->` markers.
+- Inform the user what was done. Their original content is preserved verbatim inside the user block.
+
+### Case C — CLAUDE.md does not exist
+
+Locate the eureka template using this priority order:
+1. Read `~/.claude/eureka-config.json` with Bash (`cat ~/.claude/eureka-config.json 2>/dev/null`), extract `installPath`, then read `{installPath}/framework/CLAUDE.md.template`
+2. Try `~/.claude/framework/CLAUDE.md.template`
+3. Try `.claude/framework/CLAUDE.md.template`
+4. Fall back to the inline default structure below if none found
+
+Write the completed file to the project root.
+
+---
+
+### Auto section content (all cases)
+
+Fill in the content between `<!-- eureka:auto-start -->` and `<!-- eureka:auto-end -->`:
+
 ```markdown
+## Identity
+
 - **Project**: {project_name}
 - **Stack**: {stack_summary}
 - **Description**: {description}
-```
 
-### Key Paths table
-```markdown
+## Key Paths
+
 | Path | Purpose |
 |------|---------|
-| src/models/ | Model definitions |
-| configs/ | Training configs (Hydra) |
-| scripts/ | SLURM job scripts |
-| data/ | Dataset root |
-```
+| {detected paths} | {purpose} |
 
-### Active Work
-```markdown
+## Active Work
+
 - Current focus: {summarized from git log}
 - Open items: {TODO/FIXME count}
 - Recent changes: {last 3 commits summarized}
+
+## Context Files
+
+Detailed context lives in `.claude/context/` — read on demand:
+
+- `.claude/context/experiments.md` — experiment log
+- `.claude/context/conventions.md` — project conventions
+- `.claude/context/architecture.md` — codebase architecture
 ```
 
-Write the completed CLAUDE.md to the project root.
-
-**Project name**: If not provided as argument and not detectable from `pyproject.toml` or
-`setup.py` or directory name, ask the user with AskUserQuestion.
+**Project name**: Detect from `pyproject.toml`, `setup.py`, or directory name. If not detectable, ask with AskUserQuestion.
 
 **Description**: If not detectable, ask the user.
 
-Keep the output CLAUDE.md to ~50 lines of high-signal content. No filler.
+Keep the auto section concise — ~30 lines. No filler.
 
 ## Step 5: Create Context Files
 
-Create `.claude/context/` directory and populate starter files:
+Create `.claude/context/` directory if it doesn't exist. For each file below, **skip if it already exists** — never overwrite existing context.
 
-### `.claude/context/experiments.md`
+### `.claude/context/experiments.md` (create if missing)
 ```markdown
 # Experiment Log
 
@@ -147,7 +173,7 @@ This file is updated by the agent when experiments complete.
 <!-- Entries below -->
 ```
 
-### `.claude/context/conventions.md`
+### `.claude/context/conventions.md` (create if missing)
 ```markdown
 # Project Conventions
 
@@ -156,7 +182,7 @@ Coding standards, naming patterns, config formats, and resolved gotchas.
 <!-- Entries below -->
 ```
 
-### `.claude/context/architecture.md`
+### `.claude/context/architecture.md` (create if missing)
 ```markdown
 # Architecture
 
@@ -165,9 +191,33 @@ Key modules, data flow, and design decisions.
 <!-- Entries below -->
 ```
 
-Pre-populate `architecture.md` with the detected model files and entry points from Step 2.
+Pre-populate `architecture.md` (only if newly created) with the detected model files and entry points from Step 2.
 
-## Step 6: Report
+## Step 6: Status Line Setup (optional)
+
+Check if the eureka status line is already configured:
+
+```bash
+jq -e '.statusLine' ~/.claude/settings.json 2>/dev/null
+```
+
+If the statusLine key is absent **and** `~/.claude/statusline-command.sh` exists, ask the user:
+
+> "Would you like to enable the eureka status line? It shows model, context usage, git branch, and permission mode in the terminal."
+
+If the user says yes:
+1. Get the absolute path: `STATUSLINE="$HOME/.claude/statusline-command.sh"`
+2. Merge into `~/.claude/settings.json` using jq:
+   ```bash
+   jq --arg cmd "bash $STATUSLINE" '. + {statusLine: {type: "command", command: $cmd}}' \
+     ~/.claude/settings.json > /tmp/_eureka_settings.json \
+     && mv /tmp/_eureka_settings.json ~/.claude/settings.json
+   ```
+3. Note: requires `jq`. If jq is unavailable, print the JSON snippet to add manually.
+
+If `~/.claude/statusline-command.sh` does not exist (project-level install), skip silently.
+
+## Step 7: Report
 
 Print a summary:
 ```
@@ -178,6 +228,7 @@ Bootstrap complete.
   Stack detected   — {stack_summary}
   Key paths        — {count} entries
   Active work      — {summary}
+  Status line      — enabled  (or: skipped)
 
 Run /refresh-context anytime to update auto-generated sections.
 ```

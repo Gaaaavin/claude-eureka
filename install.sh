@@ -5,7 +5,7 @@ set -euo pipefail
 # Installs Claude Code skills for ML/AI researchers
 # Usage: curl -fsSL https://raw.githubusercontent.com/Gaaaavin/claude-eureka/main/install.sh | bash
 
-EUREKA_VERSION="0.1.0"
+EUREKA_VERSION="0.1.1"
 EUREKA_REPO="Gaaaavin/claude-eureka"
 EUREKA_BRANCH="main"
 TARBALL_URL="https://github.com/${EUREKA_REPO}/archive/${EUREKA_BRANCH}.tar.gz"
@@ -104,6 +104,12 @@ cp "$SRC"/framework/hooks/*.sh "$TARGET/hooks/"
 chmod +x "$TARGET/hooks/"*.sh
 ok "hooks installed"
 
+# ─── Copy framework files ─────────────────────────────────────────────────────
+mkdir -p "$TARGET/framework"
+cp "$SRC/framework/CLAUDE.md.template" "$TARGET/framework/CLAUDE.md.template"
+cp "$SRC/framework/statusline-command.sh" "$TARGET/statusline-command.sh"
+chmod +x "$TARGET/statusline-command.sh"
+
 # ─── Merge settings.json ─────────────────────────────────────────────────────
 info "Configuring hooks..."
 SETTINGS_FILE="$TARGET/settings.json"
@@ -141,16 +147,6 @@ sed -e "s|__INSTALL_DATE__|$INSTALL_DATE|g" \
     "$SRC/framework/eureka-config.json.template" > "$CONFIG_FILE"
 ok "eureka-config.json created"
 
-# ─── Copy CLAUDE.md template (project-level only) ────────────────────────────
-if [ "$INSTALL_TYPE" = "project" ]; then
-  CLAUDE_MD="./CLAUDE.md"
-  if [ -f "$CLAUDE_MD" ]; then
-    warn "CLAUDE.md already exists — skipping (run /init-eureka to regenerate)"
-  else
-    cp "$SRC/framework/CLAUDE.md.template" "$CLAUDE_MD"
-    ok "CLAUDE.md template copied (run /init-eureka to customize)"
-  fi
-fi
 
 # ─── Summary ──────────────────────────────────────────────────────────────────
 echo ""
