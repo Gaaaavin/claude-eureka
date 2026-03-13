@@ -5,7 +5,7 @@ set -euo pipefail
 # Installs Claude Code skills for ML/AI researchers
 # Usage: curl -fsSL https://raw.githubusercontent.com/Gaaaavin/claude-eureka/main/install.sh | bash
 
-EUREKA_VERSION="0.1.1"
+EUREKA_VERSION="0.1.2"
 EUREKA_REPO="Gaaaavin/claude-eureka"
 EUREKA_BRANCH="main"
 TARBALL_URL="https://github.com/${EUREKA_REPO}/archive/${EUREKA_BRANCH}.tar.gz"
@@ -100,7 +100,7 @@ ok "${skill_count} skills installed"
 # ─── Copy hooks ───────────────────────────────────────────────────────────────
 info "Installing hooks..."
 mkdir -p "$TARGET/hooks"
-cp "$SRC"/framework/hooks/*.sh "$TARGET/hooks/"
+cp "$SRC"/hooks/*.sh "$TARGET/hooks/"
 chmod +x "$TARGET/hooks/"*.sh
 ok "hooks installed"
 
@@ -158,6 +158,13 @@ echo -e "${BOLD}Next steps:${RESET}"
 echo ""
 echo "  1. Run /init-eureka in Claude Code to auto-detect your project"
 echo "     and generate a tailored CLAUDE.md"
+echo ""
+echo -e "${DIM}For users on Claude Code with plugin support, the preferred install is:${RESET}"
+echo ""
+echo "  /plugin marketplace add Gaaaavin/claude-eureka"
+echo "  /plugin install claude-eureka@claude-eureka"
+echo ""
+echo -e "${DIM}(This curl|bash install is the fallback for older Claude Code versions.)${RESET}"
 echo ""
 echo -e "${BOLD}Recommended MCP servers:${RESET}"
 echo ""

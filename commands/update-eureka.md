@@ -8,6 +8,26 @@ allowed-tools: [Bash]
 
 Pull the latest commands and skills from `Gaaaavin/claude-eureka` and overwrite the installed versions.
 
+## Step 0: Detect install method
+
+Check whether eureka was installed via the native plugin system:
+
+```bash
+# Plugin install leaves CLAUDE_PLUGIN_ROOT set in the environment,
+# and there will be no eureka-config.json in ~/.claude/ or ./.claude/
+if [ -n "${CLAUDE_PLUGIN_ROOT:-}" ]; then
+  echo "plugin"
+elif [ -f "$HOME/.claude/eureka-config.json" ] || [ -f ".claude/eureka-config.json" ]; then
+  echo "curl-bash"
+else
+  echo "unknown"
+fi
+```
+
+**If plugin**: Run `/plugin update claude-eureka@claude-eureka` and stop — the plugin system handles the rest. No further steps needed.
+
+**If curl|bash or unknown**: Continue with Steps 1–4 below.
+
 ## Step 1: Detect install location
 
 Check where eureka is installed:
@@ -52,7 +72,7 @@ for skill_dir in "$SRC"/skills/*/; do
   mkdir -p "$TARGET/skills/$skill_name"
   cp "$skill_dir"/* "$TARGET/skills/$skill_name/"
 done
-cp "$SRC"/framework/hooks/*.sh "$TARGET/hooks/"
+cp "$SRC"/hooks/*.sh "$TARGET/hooks/"
 chmod +x "$TARGET/hooks/"*.sh
 ```
 

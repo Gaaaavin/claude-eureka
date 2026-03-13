@@ -1,0 +1,13 @@
+{
+  "UserPromptSubmit": [
+    {
+      "hooks": [
+        {
+          "command": "${CLAUDE_PLUGIN_ROOT}/hooks/skill-discovery.sh",
+          "timeout": 5000,
+          "type": "command"
+        }
+      ]
+    }
+  ]
+}

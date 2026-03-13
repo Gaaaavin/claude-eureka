@@ -11,8 +11,12 @@ PROMPT=$(echo "$INPUT" | sed -nE 's/.*"prompt"[[:space:]]*:[[:space:]]*"(([^\\"]
 
 # Match: skill, skills (case-insensitive, word boundary)
 if echo "$PROMPT" | grep -iqE '\bskills?\b'; then
-  # Check both user-level and project-level skills directories
-  for SKILLS_DIR in "${HOME}/.claude/skills" ".claude/skills"; do
+  # Check plugin-native, user-level, and project-level skills directories
+  SEARCH_DIRS=()
+  [ -n "${CLAUDE_PLUGIN_ROOT:-}" ] && SEARCH_DIRS+=("${CLAUDE_PLUGIN_ROOT}/skills")
+  SEARCH_DIRS+=("${HOME}/.claude/skills" ".claude/skills")
+
+  for SKILLS_DIR in "${SEARCH_DIRS[@]}"; do
     if [ -d "$SKILLS_DIR" ]; then
       output=""
       for d in "$SKILLS_DIR"/*/; do

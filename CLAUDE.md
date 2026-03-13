@@ -14,9 +14,12 @@
 |------|---------|
 | `commands/*.md` | Slash commands — one file per command |
 | `skills/*/SKILL.md` | Passive skills — auto-triggered by keyword |
+| `.claude-plugin/plugin.json` | Plugin manifest (native Claude Code plugin system) |
+| `.claude-plugin/marketplace.json` | Marketplace registration for self-hosted plugin |
+| `hooks/skill-discovery.sh` | UserPromptSubmit hook (plugin and curl\|bash install) |
+| `hooks/hooks.json` | Plugin-native hook registration |
 | `framework/CLAUDE.md.template` | Template installed into user projects |
-| `framework/hooks/skill-discovery.sh` | UserPromptSubmit hook bundled with install |
-| `install.sh` | curl\|bash installer (also runs from local clone) |
+| `install.sh` | curl\|bash installer — fallback for older Claude Code |
 | `.github/workflows/validate-skills.yml` | CI: frontmatter + line count validation |
 | `.claude/context/` | Agent context files (not for humans) |
 
@@ -103,8 +106,9 @@ claude-eureka/
 - **`<!-- eureka:auto -->` markers in CLAUDE.md**: `/refresh-context` rewrites auto-generated sections without destroying user edits.
 - **Context files in `.claude/context/`**: For the agent, not humans. Keeps project root clean.
 - **Tiered context**: CLAUDE.md (~50 lines, always loaded) → context files (loaded on demand) → auto-memory (agent-maintained).
-- **No auto-update**: Users control when to update (re-run install.sh). Deterministic environments matter for research.
-- **`curl | bash` install**: Users don't clone the repo. `install.sh` downloads a tarball to a temp dir, copies files, cleans up. Also works from a local clone for contributors.
+- **No auto-update**: Users control when to update (`/plugin update` or re-run `install.sh`). Deterministic environments matter for research.
+- **Plugin-first install**: Native Claude Code plugin system is the preferred install path (`.claude-plugin/plugin.json` + `hooks/hooks.json`). `install.sh` is kept as fallback for older Claude Code versions. The repo structure (`commands/`, `skills/`, `hooks/`) matches the plugin spec exactly.
+- **`curl | bash` fallback**: `install.sh` downloads a tarball to a temp dir, copies files, cleans up. Also works from a local clone for contributors.
 
 ## Conventions
 

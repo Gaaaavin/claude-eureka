@@ -112,10 +112,11 @@ If the file exists but has no eureka markers:
 ### Case C — CLAUDE.md does not exist
 
 Locate the eureka template using this priority order:
-1. Read `~/.claude/eureka-config.json` with Bash (`cat ~/.claude/eureka-config.json 2>/dev/null`), extract `installPath`, then read `{installPath}/framework/CLAUDE.md.template`
-2. Try `~/.claude/framework/CLAUDE.md.template`
-3. Try `.claude/framework/CLAUDE.md.template`
-4. Fall back to the inline default structure below if none found
+1. If `$CLAUDE_PLUGIN_ROOT` is set, try `$CLAUDE_PLUGIN_ROOT/framework/CLAUDE.md.template`
+2. Read `~/.claude/eureka-config.json` with Bash (`cat ~/.claude/eureka-config.json 2>/dev/null`), extract `installPath`, then read `{installPath}/framework/CLAUDE.md.template`
+3. Try `~/.claude/framework/CLAUDE.md.template`
+4. Try `.claude/framework/CLAUDE.md.template`
+5. Fall back to the inline default structure below if none found
 
 Write the completed file to the project root.
 
@@ -201,12 +202,16 @@ Check if the eureka status line is already configured:
 jq -e '.statusLine' ~/.claude/settings.json 2>/dev/null
 ```
 
-If the statusLine key is absent **and** `~/.claude/statusline-command.sh` exists, ask the user:
+Locate `statusline-command.sh` using this priority order:
+1. `$CLAUDE_PLUGIN_ROOT/framework/statusline-command.sh` (plugin install)
+2. `~/.claude/statusline-command.sh` (curl|bash install)
+
+If the statusLine key is absent **and** the statusline script is found at one of those paths, ask the user:
 
 > "Would you like to enable the eureka status line? It shows model, context usage, git branch, and permission mode in the terminal."
 
 If the user says yes:
-1. Get the absolute path: `STATUSLINE="$HOME/.claude/statusline-command.sh"`
+1. Use whichever path was found above (plugin root first, then `~/.claude/`): `STATUSLINE="<found path>"`
 2. Merge into `~/.claude/settings.json` using jq:
    ```bash
    jq --arg cmd "bash $STATUSLINE" '. + {statusLine: {type: "command", command: $cmd}}' \
@@ -215,7 +220,7 @@ If the user says yes:
    ```
 3. Note: requires `jq`. If jq is unavailable, print the JSON snippet to add manually.
 
-If `~/.claude/statusline-command.sh` does not exist (project-level install), skip silently.
+If neither statusline path exists, skip silently.
 
 ## Step 7: Report
 

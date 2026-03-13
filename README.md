@@ -11,8 +11,9 @@
 
 Stop re-teaching Claude your project every session. Eureka auto-detects your stack, manages experiments, debugs training, and learns as you work.
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/Gaaaavin/claude-eureka/main/install.sh | bash
+```
+/plugin marketplace add Gaaaavin/claude-eureka
+/plugin install claude-eureka@claude-eureka
 ```
 
 Then inside Claude Code: `/init-eureka`
@@ -45,11 +46,14 @@ Before eureka:        After /init-eureka:
 
 **1. Install (30 seconds)**
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/Gaaaavin/claude-eureka/main/install.sh | bash
+Inside Claude Code:
+
+```
+/plugin marketplace add Gaaaavin/claude-eureka
+/plugin install claude-eureka@claude-eureka
 ```
 
-The installer copies skills to `~/.claude/` (user-level) or `./.claude/` (project-level). Pick whichever fits. No npm, no pip — it's markdown files and one shell script.
+This registers the eureka marketplace and installs the plugin. No npm, no pip — it's markdown files and one shell script.
 
 **2. Initialize your project**
 
@@ -123,19 +127,26 @@ CLAUDE.md  (~50 lines, loaded every prompt)
 
 ## Install Options
 
-**User-level** — available in every project (recommended):
+**Plugin install** — recommended, native Claude Code integration:
+
+```
+/plugin marketplace add Gaaaavin/claude-eureka
+/plugin install claude-eureka@claude-eureka
+```
+
+Update anytime with:
+
+```
+/plugin update claude-eureka@claude-eureka
+```
+
+**Alternatively (older Claude Code versions)**:
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/Gaaaavin/claude-eureka/main/install.sh | bash
-# Choose option 1 when prompted
 ```
 
-**Project-level** — scoped to one repo, good for team setups:
-
-```bash
-# From your project directory, choose option 2:
-curl -fsSL https://raw.githubusercontent.com/Gaaaavin/claude-eureka/main/install.sh | bash
-```
+Choose user-level (`~/.claude/`, recommended) or project-level (`./.claude/`) when prompted.
 
 **Selective** — cherry-pick only the commands you want:
 

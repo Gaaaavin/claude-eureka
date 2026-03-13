@@ -1,0 +1,10 @@
+{
+  "name": "claude-eureka",
+  "version": "0.1.2",
+  "description": "Claude Code skills for ML/AI researchers. Commands for experiments, debugging, visualization, and SLURM jobs.",
+  "author": { "name": "Gaaaavin", "url": "https://github.com/Gaaaavin" },
+  "repository": "https://github.com/Gaaaavin/claude-eureka",
+  "homepage": "https://github.com/Gaaaavin/claude-eureka",
+  "license": "Apache-2.0",
+  "keywords": ["ml", "research", "pytorch", "experiments", "slurm", "ai"]
+}

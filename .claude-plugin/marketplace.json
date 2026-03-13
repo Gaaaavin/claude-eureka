@@ -1,0 +1,12 @@
+{
+  "name": "claude-eureka",
+  "owner": { "name": "Gaaaavin", "url": "https://github.com/Gaaaavin" },
+  "metadata": { "description": "Claude Code skills for ML/AI researchers" },
+  "plugins": [
+    {
+      "name": "claude-eureka",
+      "description": "Commands and passive skills for ML/AI research workflows",
+      "source": "./"
+    }
+  ]
+}
